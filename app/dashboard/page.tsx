@@ -58,9 +58,10 @@ export default function Dashboard() {
   const [runLoading, setRunLoading] = useState(false)
   const [activeTab, setActiveTab] = useState<'pending' | 'approved' | 'rejected'>('pending')
   const [authError, setAuthError] = useState(false)
+  const [errorDetail, setErrorDetail] = useState('')
 
   const authFetch = useCallback(async (url: string, options: RequestInit = {}) => {
-    const token = await getToken()
+    const token = await getToken({ template: 'default' })
     if (!token) throw new Error('No auth token')
     return fetch(`${API_URL}${url}`, {
       ...options,
@@ -75,6 +76,7 @@ export default function Dashboard() {
   const loadData = useCallback(async () => {
     if (!isLoaded || !isSignedIn) return
     setAuthError(false)
+    setErrorDetail('')
     try {
       const [propRes, analyticsRes, statusRes] = await Promise.all([
         authFetch('/api/v1/proposals'),
@@ -82,6 +84,8 @@ export default function Dashboard() {
         authFetch('/api/v1/status'),
       ])
       if (propRes.status === 401 || propRes.status === 403) {
+        const err = await propRes.json().catch(() => ({}))
+        setErrorDetail(err.message || `HTTP ${propRes.status}`)
         setAuthError(true)
         return
       }
@@ -93,6 +97,8 @@ export default function Dashboard() {
       if (statusRes.ok) setCrewStatus(await statusRes.json())
     } catch (e) {
       console.error('Load failed:', e)
+      setErrorDetail(String(e))
+      setAuthError(true)
     } finally {
       setLoading(false)
     }
@@ -133,9 +139,13 @@ export default function Dashboard() {
       })
       if (res.ok) {
         setCrewStatus(s => ({ ...s, running: true }))
+      } else {
+        const err = await res.json().catch(() => ({}))
+        alert(`Run failed (${res.status}): ${err.message || err.error || 'Unknown error'}`)
       }
     } catch (e) {
       console.error('Run failed:', e)
+      alert(`Run error: ${e}`)
     } finally {
       setRunLoading(false)
     }
@@ -186,8 +196,14 @@ export default function Dashboard() {
       <div style={{
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
         minHeight: '60vh', color: '#ef4444', fontSize: '0.9rem', gap: '1rem',
+        textAlign: 'center', padding: '2rem',
       }}>
         <p>⚠️ Authentication failed. Please sign out and sign in again.</p>
+        {errorDetail && (
+          <p style={{ fontSize: '0.75rem', color: '#4a4e65', maxWidth: '400px' }}>
+            Detail: {errorDetail}
+          </p>
+        )}
         <button className="btn btn-primary" onClick={loadData}>Retry</button>
       </div>
     )
