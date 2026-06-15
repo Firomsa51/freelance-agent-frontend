@@ -61,7 +61,7 @@ export default function Dashboard() {
   const [errorDetail, setErrorDetail] = useState('')
 
   const authFetch = useCallback(async (url: string, options: RequestInit = {}) => {
-    const token = await getToken({ template: 'default' })
+    const token = await getToken()
     if (!token) throw new Error('No auth token')
     return fetch(`${API_URL}${url}`, {
       ...options,
