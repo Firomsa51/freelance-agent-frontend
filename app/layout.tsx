@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { ClerkProvider, SignInButton, SignUpButton, UserButton, SignedIn, SignedOut } from '@clerk/nextjs'
+import Link from 'next/link'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -28,16 +29,47 @@ export default function RootLayout({
             top: 0,
             zIndex: 100,
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <span style={{ fontSize: '1.2rem' }}>⚡</span>
-              <span style={{
-                fontWeight: 700,
-                fontSize: '0.95rem',
-                color: '#e4e6f0',
-                fontFamily: 'sans-serif',
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+              <Link href="/" style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                textDecoration: 'none',
               }}>
-                FreelanceAI Agent
-              </span>
+                <span style={{ fontSize: '1.2rem' }}>⚡</span>
+                <span style={{
+                  fontWeight: 700,
+                  fontSize: '0.95rem',
+                  color: '#e4e6f0',
+                  fontFamily: 'sans-serif',
+                }}>
+                  FreelanceAI Agent
+                </span>
+              </Link>
+              <SignedIn>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                  <Link href="/dashboard" style={{
+                    padding: '0.35rem 0.8rem',
+                    borderRadius: '6px',
+                    fontSize: '0.875rem',
+                    color: '#7b7f96',
+                    textDecoration: 'none',
+                    fontFamily: 'sans-serif',
+                  }}>
+                    Dashboard
+                  </Link>
+                  <Link href="/resume" style={{
+                    padding: '0.35rem 0.8rem',
+                    borderRadius: '6px',
+                    fontSize: '0.875rem',
+                    color: '#7b7f96',
+                    textDecoration: 'none',
+                    fontFamily: 'sans-serif',
+                  }}>
+                    Resume
+                  </Link>
+                </div>
+              </SignedIn>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
               <SignedOut>
